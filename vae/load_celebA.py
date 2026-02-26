@@ -1,8 +1,9 @@
 import os
 
 import torch
+import torch.distributed as dist
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from torchvision import transforms
 
 
@@ -30,7 +31,10 @@ class CelebADataset(Dataset):
 
 def get_dataloader(root='../img_align_celeba', **kwargs):
     dataset = CelebADataset(root, **kwargs)
-    return DataLoader(dataset, 16, shuffle=True)
+    if dist.is_initialized():
+        sampler = DistributedSampler(dataset, shuffle=True)
+        return DataLoader(dataset, 32, sampler=sampler, num_workers=4, pin_memory=True)
+    return DataLoader(dataset, 32, shuffle=True)
 
 
 if __name__ == '__main__':
