@@ -4,8 +4,8 @@ import torch
 import torch.nn.functional as F
 from torchvision.transforms import ToPILImage
 
-from dldemos.VAE.load_celebA import get_dataloader
-from dldemos.VAE.model import VAE
+from load_celebA import get_dataloader
+from model import VAE
 
 # Hyperparameters
 n_epochs = 10
@@ -42,7 +42,7 @@ def train(device, dataloader, model):
         minute = int(training_time // 60)
         second = int(training_time % 60)
         print(f'epoch {i}: loss {loss_sum} {minute}:{second}')
-        torch.save(model.state_dict(), 'dldemos/VAE/model.pth')
+        torch.save(model.state_dict(), 'model.pth')
 
 
 def reconstruct(device, dataloader, model):
@@ -54,7 +54,7 @@ def reconstruct(device, dataloader, model):
     input = batch[0].detach().cpu()
     combined = torch.cat((output, input), 1)
     img = ToPILImage()(combined)
-    img.save('work_dirs/tmp.jpg')
+    img.save('tmp.jpg')
 
 
 def generate(device, model):
@@ -62,7 +62,7 @@ def generate(device, model):
     output = model.sample(device)
     output = output[0].detach().cpu()
     img = ToPILImage()(output)
-    img.save('work_dirs/tmp.jpg')
+    img.save('tmp.jpg')
 
 
 def main():
@@ -72,7 +72,7 @@ def main():
     model = VAE().to(device)
 
     # If you obtain the ckpt, load it
-    model.load_state_dict(torch.load('dldemos/VAE/model.pth', 'cuda:0'))
+    # model.load_state_dict(torch.load('model.pth', 'cuda:0'))
 
     # Choose the function
     train(device, dataloader, model)
