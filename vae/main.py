@@ -6,7 +6,7 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torchvision.transforms import ToPILImage
 
-from load_imgnet import get_dataloader
+from load_celebA import get_dataloader
 from model import VAE
 
 # Hyperparameters

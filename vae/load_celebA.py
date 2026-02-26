@@ -28,7 +28,7 @@ class CelebADataset(Dataset):
         return pipeline(img)
 
 
-def get_dataloader(root, **kwargs):
+def get_dataloader(root='../img_align_celeba', **kwargs):
     dataset = CelebADataset(root, **kwargs)
     return DataLoader(dataset, 16, shuffle=True)
 
