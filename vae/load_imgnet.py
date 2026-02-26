@@ -39,8 +39,8 @@ def get_dataloader(root='../val_blurred', **kwargs):
     dataset = ImageNetDataset(root, **kwargs)
     if dist.is_initialized():
         sampler = DistributedSampler(dataset, shuffle=True)
-        return DataLoader(dataset, 16, sampler=sampler, num_workers=4, pin_memory=True)
-    return DataLoader(dataset, 16, shuffle=True)
+        return DataLoader(dataset, 32, sampler=sampler, num_workers=4, pin_memory=True)
+    return DataLoader(dataset, 32, shuffle=True)
 
 
 if __name__ == '__main__':

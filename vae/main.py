@@ -11,14 +11,14 @@ from model import VAE
 
 # Hyperparameters
 n_epochs = 10
-kl_weight = 0.00025
-lr = 0.005
+kl_weight = 0.0005
+lr = 0.0002
+grad_clip = 1.0
 
 
 def loss_fn(y, y_hat, mean, logvar):
     recons_loss = torch.nn.functional.mse_loss(y_hat, y)
-    kl_loss = torch.mean(
-        -0.5 * torch.sum(1 + logvar - mean**2 - torch.exp(logvar), 1), 0)
+    kl_loss = -0.5 * torch.mean(torch.sum(1 + logvar - mean**2 - logvar.exp(), 1))
     loss = recons_loss + kl_loss * kl_weight
     return loss
 
@@ -48,6 +48,7 @@ def train(local_rank, dataloader, model):
             loss = loss_fn(x, y_hat, mean, logvar)
             optimizer.zero_grad()
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optimizer.step()
             loss_sum += loss.item()
 
