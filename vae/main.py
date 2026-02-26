@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 from torchvision.transforms import ToPILImage
 
-from load_celebA import get_dataloader
+from load_imgnet import get_dataloader
 from model import VAE
 
 # Hyperparameters
