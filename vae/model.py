@@ -58,7 +58,7 @@ class VAE(nn.Module):
                                    output_padding=1),
                 nn.BatchNorm2d(hiddens[0]), nn.ReLU(),
                 nn.Conv2d(hiddens[0], 3, kernel_size=3, stride=1, padding=1),
-                nn.ReLU()))
+                nn.Sigmoid()))
         self.decoder = nn.Sequential(*modules)
 
     def forward(self, x):
