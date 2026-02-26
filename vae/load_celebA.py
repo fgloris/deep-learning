@@ -28,7 +28,7 @@ class CelebADataset(Dataset):
         return pipeline(img)
 
 
-def get_dataloader(root='data/celebA/img_align_celeba', **kwargs):
+def get_dataloader(root, **kwargs):
     dataset = CelebADataset(root, **kwargs)
     return DataLoader(dataset, 16, shuffle=True)
 
@@ -45,4 +45,4 @@ if __name__ == '__main__':
     img = torch.permute(img, (0, 2, 1, 3))
     img = torch.reshape(img, (C, 4 * H, 4 * W))
     img = transforms.ToPILImage()(img)
-    img.save('work_dirs/tmp.jpg')
+    img.save('vae/result/data_sample.jpg')

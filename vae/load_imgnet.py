@@ -1,14 +1,15 @@
 import os
 
 import torch
+import torch.distributed as dist
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from torchvision import transforms
 
 
 class ImageNetDataset(Dataset):
 
-    def __init__(self, root, img_shape=(64, 64)) -> None:
+    def __init__(self, root, img_shape=(128, 128)) -> None:
         super().__init__()
         self.root = root
         self.img_shape = img_shape
@@ -36,6 +37,9 @@ class ImageNetDataset(Dataset):
 
 def get_dataloader(root='../val_blurred', **kwargs):
     dataset = ImageNetDataset(root, **kwargs)
+    if dist.is_initialized():
+        sampler = DistributedSampler(dataset, shuffle=True)
+        return DataLoader(dataset, 16, sampler=sampler, num_workers=4, pin_memory=True)
     return DataLoader(dataset, 16, shuffle=True)
 
 
@@ -51,4 +55,4 @@ if __name__ == '__main__':
     img = torch.permute(img, (0, 2, 1, 3))
     img = torch.reshape(img, (C, 4 * H, 4 * W))
     img = transforms.ToPILImage()(img)
-    img.save('work_dirs/tmp.jpg')
+    img.save('vae/result/data_sample.jpg')

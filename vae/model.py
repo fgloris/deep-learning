@@ -3,18 +3,18 @@ import torch.nn as nn
 
 
 class VAE(nn.Module):
-    """VAE for 64x64 face generation.
+    """VAE for 128x128 face generation.
 
     The hidden dimensions can be tuned.
     """
 
-    def __init__(self, hiddens=[16, 32, 64, 128, 256], latent_dim=128) -> None:
+    def __init__(self, hiddens=[64, 128, 256, 512, 1024], latent_dim=512) -> None:
         super().__init__()
 
         # encoder
         prev_channels = 3
         modules = []
-        img_length = 64
+        img_length = 128
         for cur_channels in hiddens:
             modules.append(
                 nn.Sequential(
