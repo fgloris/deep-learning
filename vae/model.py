@@ -64,16 +64,17 @@ class VAE(nn.Module):
     def forward(self, x):
         encoded = self.encoder(x)
         encoded = torch.flatten(encoded, 1)
-        mean = self.mean_linear(encoded)
-        logvar = self.var_linear(encoded)
-        eps = torch.randn_like(logvar)
+        mean = self.mean_linear(encoded)  # 把卷积的encoder输出用一个全连接映射到潜空间的 μ
+        logvar = self.var_linear(encoded) # 把卷积的encoder输出映射到潜空间的 logσ²
+                                          # 图像空间是128x128, 压缩到512维的潜空间，即压缩了32倍。
+        epsilon = torch.randn_like(logvar)
         std = torch.exp(logvar / 2)
-        z = eps * std + mean
-        x = self.decoder_projection(z)
+        z = epsilon * std + mean          # 重参数化技巧: z = μ + σ·ε, 其中: ε ~ N(0, I)
+        x = self.decoder_projection(z)    # 把潜空间的点z映射到decoder像素维度
         x = torch.reshape(x, (-1, *self.decoder_input_chw))
         decoded = self.decoder(x)
 
-        return decoded, mean, logvar
+        return decoded, mean, logvar, epsilon
 
     def sample(self, device='cuda'):
         z = torch.randn(1, self.latent_dim).to(device)

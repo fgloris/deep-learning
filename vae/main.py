@@ -16,10 +16,12 @@ lr = 0.0002
 grad_clip = 1.0
 
 
-def loss_fn(y, y_hat, mean, logvar):
+def loss_fn(y, y_hat, mean, logvar, epsilon):
     recons_loss = torch.nn.functional.mse_loss(y_hat, y)
     kl_loss = -0.5 * torch.mean(torch.sum(1 + logvar - mean**2 - logvar.exp(), 1))
-    loss = recons_loss + kl_loss * kl_weight
+    # epsilon越大，权重越小
+    weight = 1.0 / (torch.mean(torch.abs(epsilon)) + 1e-8)
+    loss = (recons_loss + kl_loss * kl_weight) * weight
     return loss
 
 
@@ -44,8 +46,8 @@ def train(local_rank, dataloader, model):
         loss_sum = 0
         for x in dataloader:
             x = x.cuda(local_rank)
-            y_hat, mean, logvar = model(x)
-            loss = loss_fn(x, y_hat, mean, logvar)
+            y_hat, mean, logvar, epsilon = model(x)
+            loss = loss_fn(x, y_hat, mean, logvar, epsilon)
             optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)

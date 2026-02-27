@@ -8,7 +8,6 @@ from torchvision import transforms
 
 
 class CelebADataset(Dataset):
-
     def __init__(self, root, img_shape=(128, 128)) -> None:
         super().__init__()
         self.root = root
